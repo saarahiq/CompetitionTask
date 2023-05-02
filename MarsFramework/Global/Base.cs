@@ -36,16 +36,18 @@ namespace MarsFramework.Global
                     GlobalDefinitions.driver = new FirefoxDriver();
                     break;
                 case 2:
-                    GlobalDefinitions.driver = new ChromeDriver();
+                    GlobalDefinitions.driver = new ChromeDriver("C:\\Program Files\\Google\\Chrome\\Application");
                     GlobalDefinitions.driver.Manage().Window.Maximize();
                     break;
 
             }
-
+            
             #region Initialise Reports
 
             extent = new ExtentReports(ReportPath, false, DisplayOrder.NewestFirst);
             extent.LoadConfig(MarsResource.ReportXMLPath);
+            // Initialise Test
+            test = extent.StartTest("CompetitionTask");
 
             #endregion
 

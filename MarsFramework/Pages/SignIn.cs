@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
+using System.Threading;
 
 namespace MarsFramework.Pages
 {
@@ -31,7 +32,14 @@ namespace MarsFramework.Pages
 
         internal void LoginSteps()
         {
+            // Launch Mars website
+            Global.GlobalDefinitions.driver.Navigate().GoToUrl("http://localhost:5000/Home");
+            Thread.Sleep(1000);
 
+            SignIntab.Click();
+            Email.SendKeys("jessica@hotmail.com");
+            Password.SendKeys("123123");
+            LoginBtn.Click();   
         }
     }
 }

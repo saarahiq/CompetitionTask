@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using MarsFramework.Pages;
+using NUnit.Framework;
 
 namespace MarsFramework
 {
@@ -9,15 +10,13 @@ namespace MarsFramework
         class User : Global.Base
         {
 
-            [Test]
-            public void Test()
+            [Test, Order(1), Description("Check if user is able to create a ShareSkill listing with valid data")]
+            public void EnterShareSkill()
             {
-
+                ShareSkill shareSkillPage = new ShareSkill();
+                shareSkillPage.EnterShareSkill(2);
 
             }
-
-
-
         }
     }
 }
