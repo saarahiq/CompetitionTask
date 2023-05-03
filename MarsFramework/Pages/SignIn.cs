@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using MarsFramework.Global;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
 using System.Threading;
 
@@ -32,13 +33,19 @@ namespace MarsFramework.Pages
 
         internal void LoginSteps()
         {
-            // Launch Mars website
-            Global.GlobalDefinitions.driver.Navigate().GoToUrl("http://localhost:5000/Home");
-            Thread.Sleep(1000);
+            int row = 2;
 
+            GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "SignIn");
+            string url = GlobalDefinitions.ExcelLib.ReadData(row, "Url");
+
+            // Launch Mars website
+            Global.GlobalDefinitions.driver.Navigate().GoToUrl(url); Thread.Sleep(1000);
             SignIntab.Click();
-            Email.SendKeys("jessica@hotmail.com");
-            Password.SendKeys("123123");
+
+            string username = GlobalDefinitions.ExcelLib.ReadData(row, "Username");
+            Email.SendKeys(username);
+            string password = GlobalDefinitions.ExcelLib.ReadData(row, "Password");
+            Password.SendKeys(password);
             LoginBtn.Click();   
         }
     }

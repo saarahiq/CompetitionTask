@@ -216,8 +216,8 @@ namespace MarsFramework.Pages
                 string credit = GlobalDefinitions.ExcelLib.ReadData(row, "Credit");
                 CreditAmount.Click(); CreditAmount.SendKeys(credit);
             }
-            Thread.Sleep(1000);
-            
+            Thread.Sleep(2000);
+
             // Upload Work Samples
             IWebElement workSample = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[9]/div/div[2]/section/div/label/div/span/i"));
             workSample.Click();
@@ -243,11 +243,11 @@ namespace MarsFramework.Pages
 
             // Click on Save
             Save.Click();
-            Thread.Sleep(3000);
+            Thread.Sleep(2000);
 
             //Navigate to Manage Listings Page
             Global.GlobalDefinitions.driver.Navigate().GoToUrl("http://localhost:5000/Home/ListingManagement");
-            Thread.Sleep(1000);
+            Thread.Sleep(2000);
 
             //Assertions
             var listingTitle = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"listing-management-section\"]/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[3]"));
@@ -257,9 +257,162 @@ namespace MarsFramework.Pages
             Assert.AreEqual(GlobalDefinitions.ExcelLib.ReadData(row, "Description"), listingDescription.Text);
         }
 
-        internal void EditShareSkill()
+        internal void EditShareSkill(int rowNo)
         {
+            //Populate the Excel Sheet
+            GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "EditShareSkill");
 
+            // Edit Share Skill Page
+            string title = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Title");
+            Title.Clear(); Title.SendKeys(title);
+            Thread.Sleep(2000);
+
+            string description = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Description");
+            Description.Clear(); Description.SendKeys(description);
+            Thread.Sleep(2000);
+
+            CategoryDropDown.Click();
+            string category = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Category");
+            SelectElement select = new SelectElement(GlobalDefinitions.driver.FindElement(By.XPath("//select[@name ='categoryId']")));
+            select.SelectByText(category);
+            Thread.Sleep(2000);
+
+            SubCategoryDropDown.Click();
+            string subcategory = GlobalDefinitions.ExcelLib.ReadData(rowNo, "SubCategory");
+            SelectElement selectSubCategory = new SelectElement(GlobalDefinitions.driver.FindElement(By.XPath("//select[@name ='subcategoryId']")));
+            selectSubCategory.SelectByText(subcategory);
+            Thread.Sleep(2000);
+
+            string tags = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Tags");
+            //Remove existing Tag
+            GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[4]/div[2]/div/div/div/span/a")).Click();
+            Tags.Click(); Tags.SendKeys(tags); Tags.SendKeys(Keys.Return);
+            Thread.Sleep(2000);
+
+            // Edit Service Type
+            string serviceType = GlobalDefinitions.ExcelLib.ReadData(rowNo, "ServiceType");
+
+            if (serviceType == "Hourly basis service")
+            {
+                GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[5]/div[2]/div[1]/div[1]/div/input")).Click();
+            }
+            else if (serviceType == "One-off service")
+            {
+                GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[5]/div[2]/div[1]/div[2]/div/input")).Click();
+            }
+            Thread.Sleep(2000);
+
+            // Edit Location Type
+            string locationType = GlobalDefinitions.ExcelLib.ReadData(rowNo, "LocationType");
+
+            if (locationType == "Online")
+            {
+                GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[6]/div[2]/div/div[2]/div/input")).Click();
+            }
+            else if (locationType == "On-site")
+            {
+                GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[6]/div[2]/div/div[1]/div/input")).Click();
+            }
+            Thread.Sleep(2000);
+
+            string startDate = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Startdate");
+            StartDateDropDown.Click();
+            StartDateDropDown.SendKeys(startDate);
+            Thread.Sleep(2000);
+
+            string endDate = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Enddate");
+            EndDateDropDown.Click();
+            EndDateDropDown.SendKeys(endDate);
+            Thread.Sleep(2000);
+
+            string day = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Selectday");
+            string startTime = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Starttime");
+            string endTime = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Endtime");
+
+            if (day == "Mon")
+            {
+                // I need to get Monday Checkbox XPath
+                GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[7]/div[2]/div/div[3]/div[1]/div/input")).Click();
+
+                // I need to get Monday Start Time XPath
+                IWebElement mondayStartTime = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[7]/div[2]/div/div[3]/div[2]/input"));
+                mondayStartTime.Click(); mondayStartTime.SendKeys(startTime);
+
+                // I need to get Monday End Time XPath.
+                IWebElement mondayEndTime = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[7]/div[2]/div/div[3]/div[3]/input"));
+                mondayEndTime.Click(); mondayEndTime.SendKeys(endTime);
+            }
+            else if (day == "Tue")
+            {
+                // I need to get Tuesday Checkbox XPath
+                GlobalDefinitions.wait(3);
+                GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[7]/div[2]/div/div[4]/div[1]/div/input")).Click();
+                                                                 
+                // I need to get Tuesday Start Time XPath
+                IWebElement tueStartTime = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[7]/div[2]/div/div[4]/div[2]/input"));
+                tueStartTime.Click();
+                GlobalDefinitions.WaitForElement(Global.GlobalDefinitions.driver, By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[7]/div[2]/div/div[4]/div[2]/input"), 5);
+                tueStartTime.SendKeys(startTime);
+
+                // I need to get Tuesday End Time XPath.
+                IWebElement tueEndTime = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[7]/div[2]/div/div[4]/div[3]/input"));
+                tueEndTime.Click(); tueEndTime.SendKeys(endTime);
+            }
+            Thread.Sleep(2000);
+
+            // Select Skill Trade option
+
+            string skillTrade = GlobalDefinitions.ExcelLib.ReadData(rowNo, "SkillTrade");
+
+            if (skillTrade == "Skill-Exchange")
+            {
+                // I click on Skill-exchange option
+                GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[8]/div[2]/div/div[1]/div/input")).Click();
+                // Add Skill-Exchange
+                string skillExchange = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Skill-Exchange");
+                SkillExchange.Click(); SkillExchange.SendKeys(skillExchange); SkillExchange.SendKeys(Keys.Return);
+            }
+            else if (skillTrade == "Credit")
+            {
+                // I click on the Credit option
+                GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[8]/div[2]/div/div[2]/div/input")).Click();
+                string credit = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Credit");
+                CreditAmount.Click(); CreditAmount.SendKeys(credit);
+            }
+            Thread.Sleep(2000);
+
+            //// Upload Work Samples - Cannot upload files and save, shows error message ""
+            //IWebElement workSample = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[9]/div/div[2]/section/div/label/div/span/i"));
+            //workSample.Click();
+
+            //Thread.Sleep(2000);
+
+            //AutoItX.WinActivate("Open"); // Window name to select a file 
+            //AutoItX.Send(@"C:\Users\saara\Downloads\Team photo_April 19, 2023.png"); // file path 
+            //AutoItX.Send("{Enter}");
+            //Thread.Sleep(2000);
+
+            // Select Active option
+            string active = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Active");
+
+            if (active == "Online")
+            {
+                GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[10]/div[2]/div/div[1]/div/input")).Click();
+            }
+            else if (active == "Hidden")
+            {
+                GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[10]/div[2]/div/div[1]/div/input")).Click();
+            }
+            // Click on Save
+            Save.Click();
+            Thread.Sleep(2000);
+
+            //Assertions
+            var listingTitle = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"listing-management-section\"]/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[3]"));
+            Assert.AreEqual(GlobalDefinitions.ExcelLib.ReadData(rowNo, "Title"), listingTitle.Text);
+
+            var listingDescription = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"listing-management-section\"]/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[4]"));
+            Assert.AreEqual(GlobalDefinitions.ExcelLib.ReadData(rowNo, "Description"), listingDescription.Text);
         }
     }
 }

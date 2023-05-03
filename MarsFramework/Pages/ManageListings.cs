@@ -1,6 +1,7 @@
 ﻿using MarsFramework.Global;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
+using System.Threading;
 
 namespace MarsFramework.Pages
 {
@@ -38,5 +39,15 @@ namespace MarsFramework.Pages
 
 
         }
+        public void GoToPage()
+        {
+            GlobalDefinitions.WaitForElement(Global.GlobalDefinitions.driver, By.LinkText("Manage Listings"), 10);
+            manageListingsLink.Click();
+
+            // Click on Edit Button
+            GlobalDefinitions.wait(5);
+            edit.Click();
+        }
+
     }
 }
