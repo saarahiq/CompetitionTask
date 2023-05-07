@@ -388,9 +388,10 @@ namespace MarsFramework.Pages
             //Thread.Sleep(2000);
 
             //AutoItX.WinActivate("Open"); // Window name to select a file 
-            //AutoItX.Send(@"C:\Users\saara\Downloads\Team photo_April 19, 2023.png"); // file path 
+            //AutoItX.Send(@"C:\Users\saara\Downloads\Team photo_April 19, 2023.png");  
             //AutoItX.Send("{Enter}");
             //Thread.Sleep(2000);
+
 
             // Select Active option
             string active = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Active");
