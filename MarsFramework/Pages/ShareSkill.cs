@@ -4,6 +4,7 @@ using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
 using OpenQA.Selenium.Support.UI;
+using RelevantCodes.ExtentReports;
 using System;
 using System.Threading;
 using static MarsFramework.Global.GlobalDefinitions;
@@ -93,7 +94,7 @@ namespace MarsFramework.Pages
         [FindsBy(How = How.XPath, Using = "//input[@value='Save']")]
         private IWebElement Save { get; set; }
 
-        internal void EnterShareSkill(int rowNo)
+        internal void EnterShareSkill(int rowNo, ExtentTest test)
         {
             int row = rowNo;
 
@@ -255,9 +256,12 @@ namespace MarsFramework.Pages
 
             var listingDescription = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"listing-management-section\"]/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[4]"));
             Assert.AreEqual(GlobalDefinitions.ExcelLib.ReadData(row, "Description"), listingDescription.Text);
+
+            // logging to extent reports
+            test.Log(LogStatus.Info, "Successfully created a new Share Skill listing");
         }
 
-        internal void EditShareSkill(int rowNo)
+        internal void EditShareSkill(int rowNo, ExtentTest test)
         {
             //Populate the Excel Sheet
             GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "EditShareSkill");
@@ -265,29 +269,29 @@ namespace MarsFramework.Pages
             // Edit Share Skill Page
             string title = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Title");
             Title.Clear(); Title.SendKeys(title);
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             string description = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Description");
             Description.Clear(); Description.SendKeys(description);
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             CategoryDropDown.Click();
             string category = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Category");
             SelectElement select = new SelectElement(GlobalDefinitions.driver.FindElement(By.XPath("//select[@name ='categoryId']")));
             select.SelectByText(category);
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             SubCategoryDropDown.Click();
             string subcategory = GlobalDefinitions.ExcelLib.ReadData(rowNo, "SubCategory");
             SelectElement selectSubCategory = new SelectElement(GlobalDefinitions.driver.FindElement(By.XPath("//select[@name ='subcategoryId']")));
             selectSubCategory.SelectByText(subcategory);
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             string tags = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Tags");
             //Remove existing Tag
             GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[4]/div[2]/div/div/div/span/a")).Click();
             Tags.Click(); Tags.SendKeys(tags); Tags.SendKeys(Keys.Return);
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             // Edit Service Type
             string serviceType = GlobalDefinitions.ExcelLib.ReadData(rowNo, "ServiceType");
@@ -300,7 +304,7 @@ namespace MarsFramework.Pages
             {
                 GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[5]/div[2]/div[1]/div[2]/div/input")).Click();
             }
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             // Edit Location Type
             string locationType = GlobalDefinitions.ExcelLib.ReadData(rowNo, "LocationType");
@@ -313,17 +317,17 @@ namespace MarsFramework.Pages
             {
                 GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[6]/div[2]/div/div[1]/div/input")).Click();
             }
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             string startDate = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Startdate");
             StartDateDropDown.Click();
             StartDateDropDown.SendKeys(startDate);
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             string endDate = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Enddate");
             EndDateDropDown.Click();
             EndDateDropDown.SendKeys(endDate);
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             string day = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Selectday");
             string startTime = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Starttime");
@@ -358,7 +362,7 @@ namespace MarsFramework.Pages
                 IWebElement tueEndTime = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[7]/div[2]/div/div[4]/div[3]/input"));
                 tueEndTime.Click(); tueEndTime.SendKeys(endTime);
             }
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             // Select Skill Trade option
 
@@ -379,9 +383,9 @@ namespace MarsFramework.Pages
                 string credit = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Credit");
                 CreditAmount.Click(); CreditAmount.SendKeys(credit);
             }
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
-            //// Upload Work Samples - Cannot upload files and save, shows error message ""
+            //// Upload Work Samples - Cannot upload when editing and saving, shows error message "There is an error when updating Work Samples - undefined"
             //IWebElement workSample = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[9]/div/div[2]/section/div/label/div/span/i"));
             //workSample.Click();
 
@@ -406,14 +410,17 @@ namespace MarsFramework.Pages
             }
             // Click on Save
             Save.Click();
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
-            //Assertions
+            //Assert that the listing was edited successfully with valid details 
             var listingTitle = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"listing-management-section\"]/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[3]"));
             Assert.AreEqual(GlobalDefinitions.ExcelLib.ReadData(rowNo, "Title"), listingTitle.Text);
 
             var listingDescription = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"listing-management-section\"]/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[4]"));
             Assert.AreEqual(GlobalDefinitions.ExcelLib.ReadData(rowNo, "Description"), listingDescription.Text);
+
+            // logging to extent reports
+            test.Log(LogStatus.Info, "Successfully Edited an existing Share Skill listing");
         }
     }
 }

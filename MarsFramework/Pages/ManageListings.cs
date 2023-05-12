@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
+using RelevantCodes.ExtentReports;
 using System;
 using System.ComponentModel;
 using System.Threading;
@@ -57,7 +58,7 @@ namespace MarsFramework.Pages
             edit.Click();
         }
 
-        public void DeleteShareSkill(int rowNo)
+        public void DeleteShareSkill(int rowNo, ExtentTest test)
         {
 
             //Populate the Excel Sheet
@@ -71,11 +72,37 @@ namespace MarsFramework.Pages
             clickActionsButton.Click();
             IWebElement yesButton = clickActionsButton.FindElement(By.XPath(".//button[contains(text(), 'Yes')]"));
             yesButton.Click();
+            Thread.Sleep(1000);
 
-            //Assert that the record was deleted by Checking the PopUp message 
+            //Assert that the listing was deleted by Checking the PopUp message 
             IWebElement popUpMessage = GlobalDefinitions.driver.FindElement(By.ClassName("ns-box-inner"));
             Assert.AreEqual(title + " has been deleted", popUpMessage.Text);
-            
+
+            // logging to extent reports
+            test.Log(LogStatus.Info, "Successfully Deleted an existing Share Skill listing");
+
+        }
+        public void ViewShareSkill(int rowNo, ExtentTest test)
+        {
+            //Populate the Excel Sheet
+            GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "ShareSkill");
+            string title = GlobalDefinitions.ExcelLib.ReadData(rowNo, "Title");
+
+            // Click on View button on Manage Listings page
+            GlobalDefinitions.wait(5);
+            view.Click();
+            Thread.Sleep(1000);
+
+            // Assert that the View page has the correct details
+            var listingTitle = GlobalDefinitions.driver.FindElement(By.ClassName("skill-title"));
+            Assert.AreEqual(GlobalDefinitions.ExcelLib.ReadData(rowNo, "Title"), listingTitle.Text);
+            Thread.Sleep(1000);
+
+            var listingDescription = GlobalDefinitions.driver.FindElement(By.ClassName("description"));
+            Assert.AreEqual(GlobalDefinitions.ExcelLib.ReadData(rowNo, "Description"), listingDescription.Text);
+
+            // logging to extent report 
+            test.Log(LogStatus.Info, "Successfully Viewed a Share Skill listing");
         }
 
     }
