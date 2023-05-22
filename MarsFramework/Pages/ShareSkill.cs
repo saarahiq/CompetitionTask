@@ -5,7 +5,10 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
 using OpenQA.Selenium.Support.UI;
 using RelevantCodes.ExtentReports;
+using RelevantCodes.ExtentReports.Model;
 using System;
+using System.Deployment.Internal;
+using System.Net.NetworkInformation;
 using System.Threading;
 using static MarsFramework.Global.GlobalDefinitions;
 
@@ -94,43 +97,123 @@ namespace MarsFramework.Pages
         [FindsBy(How = How.XPath, Using = "//input[@value='Save']")]
         private IWebElement Save { get; set; }
 
-        internal void EnterShareSkill(int rowNo, ExtentTest test)
-        {
-            int row = rowNo;
+        //PopUp Message
+        [FindsBy(How = How.XPath, Using = "/html/body/div[1]/div")]
+        private IWebElement PopUpMessage { get; set; }
 
+        //Title required Error Message
+        [FindsBy(How = How.XPath, Using = "//*[@id=\"service-listing-section\"]/div[2]/div/form/div[1]/div/div[2]/div/div[2]/div")]
+        private IWebElement TitleErrorMessage { get; set; }
+
+        //Description required Error Message
+        [FindsBy(How = How.XPath, Using = "//*[@id=\"service-listing-section\"]/div[2]/div/form/div[2]/div/div[2]/div[2]/div")] 
+        private IWebElement DescriptionErrorMessage { get; set; }
+
+        //Category required Error Message
+        [FindsBy(How = How.XPath, Using = "//*[@id=\"service-listing-section\"]/div[2]/div/form/div[3]/div[2]/div[2]")]
+        private IWebElement CategoryErrorMessage { get; set; }
+
+        //SubCategory required Error Message
+        [FindsBy(How = How.XPath, Using = "//*[@id=\"service-listing-section\"]/div[2]/div/form/div[3]/div[2]/div/div[2]/div[2]/div")]
+        private IWebElement SubCategoryErrorMessage { get; set; }                                                          
+
+        //Tags required Error Message
+        [FindsBy(How = How.XPath, Using = "//*[@id=\"service-listing-section\"]/div[2]/div/form/div[4]/div[2]/div[2]")]
+        private IWebElement TagsErrorMessage { get; set; }
+
+        //Skill-Exchange Tags required Error Message
+        [FindsBy(How = How.XPath, Using = "//*[@id=\"service-listing-section\"]/div[2]/div/form/div[8]/div[4]/div[2]")]
+        private IWebElement SkillExchangeErrorMessage { get; set; }
+        public void GoToShareSkill()
+        {
+            GlobalDefinitions.WaitForElement(GlobalDefinitions.driver, By.LinkText("Share Skill"), 10);
+            ShareSkillButton.Click();
+        }
+        internal void EnterShareSkillByExcelData(int row, ExtentTest test)
+        {
             //Populate the Excel Sheet
             GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "ShareSkill");
 
-            GlobalDefinitions.WaitForElement(Global.GlobalDefinitions.driver, By.LinkText("Share Skill"), 10);
-
-            // Click on Share skill button 
-            ShareSkillButton.Click();
-
             // Input Title
             string title = GlobalDefinitions.ExcelLib.ReadData(row, "Title");
-            Title.SendKeys(title);
 
             //Input Description
             string description = GlobalDefinitions.ExcelLib.ReadData(row, "Description");
-            Description.SendKeys(description);
 
             // Select Category and sub-category option
-            CategoryDropDown.Click();
             string category = GlobalDefinitions.ExcelLib.ReadData(row, "Category");
-            SelectElement select = new SelectElement(GlobalDefinitions.driver.FindElement(By.XPath("//select[@name ='categoryId']")));
-            select.SelectByText(category);
 
-            SubCategoryDropDown.Click(); 
             string subcategory = GlobalDefinitions.ExcelLib.ReadData(row, "SubCategory");
-            SelectElement selectSubCategory = new SelectElement(GlobalDefinitions.driver.FindElement(By.XPath("//select[@name ='subcategoryId']")));
-            selectSubCategory.SelectByText(subcategory);
 
             // Enter Tags
             string tags = GlobalDefinitions.ExcelLib.ReadData(row, "Tags");
-            Tags.Click(); Tags.SendKeys(tags); Tags.SendKeys(Keys.Return);
 
             //Select Service Type 
-            string serviceType = GlobalDefinitions.ExcelLib.ReadData(row, "ServiceType"); 
+            string serviceType = GlobalDefinitions.ExcelLib.ReadData(row, "ServiceType");
+
+            //Select Location Type
+            string locationType = GlobalDefinitions.ExcelLib.ReadData(row, "LocationType");
+
+            // Select Start and End Date
+            string startDate = GlobalDefinitions.ExcelLib.ReadData(row, "Startdate");
+
+            string endDate = GlobalDefinitions.ExcelLib.ReadData(row, "Enddate");
+
+            string day = GlobalDefinitions.ExcelLib.ReadData(row, "Selectday");
+            string startTime = GlobalDefinitions.ExcelLib.ReadData(row, "Starttime");
+            string endTime = GlobalDefinitions.ExcelLib.ReadData(row, "Endtime");
+
+            // Select Skill Trade option
+            string skillTrade = GlobalDefinitions.ExcelLib.ReadData(row, "SkillTrade");
+
+            string skillExchange = GlobalDefinitions.ExcelLib.ReadData(row, "Skill-Exchange");
+
+            string credit = GlobalDefinitions.ExcelLib.ReadData(row, "Credit");
+
+            // Select Active option
+            string active = GlobalDefinitions.ExcelLib.ReadData(row, "Active");
+
+            EnterShareSkill(title, description, category, subcategory, tags, serviceType, locationType, startDate, endDate, day, startTime, endTime, skillTrade, skillExchange, credit, active, true, test);
+             
+        }
+
+        internal void EnterShareSkill(string title,
+            string description,
+            string category,
+            string subcategory,
+            string tags,
+            string serviceType,
+            string locationType,
+            string startDate,
+            string endDate,
+            string day,
+            string startTime,
+            string endTime,
+            string skillTrade,
+            string skillExchange,
+            string credit,
+            string active,
+            bool uploadWorkSample,
+            ExtentTest test)
+        {
+            Title.SendKeys(title);
+            Description.SendKeys(description);
+       
+            if (category != "")
+            {
+                CategoryDropDown.Click();
+                SelectElement select = new SelectElement(GlobalDefinitions.driver.FindElement(By.XPath("//select[@name ='categoryId']")));
+                select.SelectByText(category);
+            }
+     
+            if (subcategory != "")
+            {
+                SubCategoryDropDown.Click();
+                SelectElement selectSubCategory = new SelectElement(GlobalDefinitions.driver.FindElement(By.XPath("//select[@name ='subcategoryId']")));
+                selectSubCategory.SelectByText(subcategory);
+            }
+
+            Tags.Click(); Tags.SendKeys(tags); Tags.SendKeys(Keys.Return);
 
             if (serviceType == "Hourly basis service")
             {
@@ -139,10 +222,7 @@ namespace MarsFramework.Pages
             else if (serviceType == "One-off service")
             {
                 GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[5]/div[2]/div[1]/div[2]/div/input")).Click();
-            }
-
-            //Select Location Type
-            string locationType = GlobalDefinitions.ExcelLib.ReadData(row, "LocationType");
+            }           
 
             if (locationType == "Online")
             {
@@ -153,22 +233,15 @@ namespace MarsFramework.Pages
                 GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[6]/div[2]/div/div[1]/div/input")).Click();
             }
 
-            // Select Start and End Date
-            string startDate = GlobalDefinitions.ExcelLib.ReadData(row, "Startdate");
             StartDateDropDown.Click();
             StartDateDropDown.SendKeys(startDate);
 
-            string endDate = GlobalDefinitions.ExcelLib.ReadData(row, "Enddate");
             EndDateDropDown.Click();
             EndDateDropDown.SendKeys(endDate);
 
             // Select Day
             // If it's Monday, we get the Monday Checkbox, and the start time and end time.
-            
-            string day = GlobalDefinitions.ExcelLib.ReadData(row, "Selectday");
-            string startTime = GlobalDefinitions.ExcelLib.ReadData(row, "Starttime");
-            string endTime = GlobalDefinitions.ExcelLib.ReadData(row, "Endtime");
-           
+      
             if (day == "Mon")
             {
                 // I need to get Monday Checkbox XPath
@@ -198,41 +271,33 @@ namespace MarsFramework.Pages
                 tueEndTime.Click(); tueEndTime.SendKeys(endTime);
             }
 
-            // Select Skill Trade option
-
-            string skillTrade = GlobalDefinitions.ExcelLib.ReadData(row, "SkillTrade");
-
             if (skillTrade == "Skill-Exchange")
             {
                 // I click on Skill-exchange option
                 GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[8]/div[2]/div/div[1]/div/input")).Click();
                 // Add Skill-Exchange
-                string skillExchange = GlobalDefinitions.ExcelLib.ReadData(row, "Skill-Exchange");
+
                 SkillExchange.Click(); SkillExchange.SendKeys(skillExchange); SkillExchange.SendKeys(Keys.Return);
             }
             else if (skillTrade == "Credit")
             {
                 // I click on the Credit option
                 GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[8]/div[2]/div/div[2]/div/input")).Click();
-                string credit = GlobalDefinitions.ExcelLib.ReadData(row, "Credit");
+
                 CreditAmount.Click(); CreditAmount.SendKeys(credit);
             }
-            Thread.Sleep(2000);
-
-            // Upload Work Samples
-            IWebElement workSample = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[9]/div/div[2]/section/div/label/div/span/i"));
-            workSample.Click();
             
-            Thread.Sleep(1000);
-            
-            AutoItX.WinActivate("Open"); // Window name to select a file 
-            AutoItX.Send(@"C:\Users\saara\Downloads\ID-Supporting-Document.pdf"); // file path 
-            AutoItX.Send("{Enter}");
-            Thread.Sleep(2000);
-
-            // Select Active option
-            string active = GlobalDefinitions.ExcelLib.ReadData(row, "Active");
-
+            // Upload Work 
+            if (uploadWorkSample == true)
+            { 
+                IWebElement workSample = GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[9]/div/div[2]/section/div/label/div/span/i"));
+                workSample.Click();
+                AutoItX.WinActivate("Open"); // Window name to select a file 
+                Thread.Sleep(1000);
+                AutoItX.Send(@"C:\Users\saara\OneDrive\Documents\Mars Competition Task-2\Test Upload File.txt"); // file path 
+                AutoItX.Send("{Enter}");
+                Thread.Sleep(1000);
+            }
             if (active == "Online")
             {
                 GlobalDefinitions.driver.FindElement(By.XPath("//*[@id=\"service-listing-section\"]/div[2]/div/form/div[10]/div[2]/div/div[1]/div/input")).Click();
@@ -244,8 +309,10 @@ namespace MarsFramework.Pages
 
             // Click on Save
             Save.Click();
-            Thread.Sleep(2000);
-
+            Thread.Sleep(500);        
+        }
+        internal void VerifyShareSkillHasBeenEntered(int row, ExtentTest test)
+        {
             //Navigate to Manage Listings Page
             Global.GlobalDefinitions.driver.Navigate().GoToUrl("http://localhost:5000/Home/ListingManagement");
             Thread.Sleep(2000);
@@ -421,6 +488,113 @@ namespace MarsFramework.Pages
 
             // logging to extent reports
             test.Log(LogStatus.Info, "Successfully Edited an existing Share Skill listing");
+        }
+
+        internal void VerifyFieldErrorMessages(int row, ExtentTest test)
+        {
+            Thread.Sleep(1000);
+
+            //Verify PopUp Error Message
+            Assert.AreEqual("Please complete the form correctly.", PopUpMessage.Text);
+
+            //Verify Title is required
+            string title = GlobalDefinitions.ExcelLib.ReadData(row, "Title");
+            if (title == "")
+            {
+                Assert.AreEqual("Title is required", TitleErrorMessage.Text);
+            }
+
+            //Verify Description is required
+            string description = GlobalDefinitions.ExcelLib.ReadData(row, "Description");
+            if (description == "")
+            {
+                Assert.AreEqual("Description is required", DescriptionErrorMessage.Text);
+            }
+
+            //Verify Category is required
+            string category = GlobalDefinitions.ExcelLib.ReadData(row, "Category");
+            if (category == "")
+            {
+                Assert.AreEqual("Category is required", CategoryErrorMessage.Text);
+            }
+            else
+            {
+                string subCategory = GlobalDefinitions.ExcelLib.ReadData(row, "Subcategory");
+                if (subCategory == "")
+                {
+                    Assert.AreEqual("Subcategory is required", SubCategoryErrorMessage.Text);
+                }
+            }
+
+            //Verify Tags are required
+            string tags = GlobalDefinitions.ExcelLib.ReadData(row, "Tags");
+            if (tags == "")
+            {
+                Assert.AreEqual("Tags are required", TagsErrorMessage.Text);
+            }
+
+            //Verify Skill-Exchange Tags is required
+            string skillExchange = GlobalDefinitions.ExcelLib.ReadData(row, "Skill-Exchange");
+            if (skillExchange == "")
+            {
+                Assert.AreEqual("Tag is required", SkillExchangeErrorMessage.Text);
+            }
+            // logging to extent reports
+            test.Log(LogStatus.Info, "Successfully Verified field error messages");
+        }
+        internal void VerifyCharacterLengthOfTitle(int row, ExtentTest test)
+        {
+            //Populate the Excel Sheet
+            GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "ShareSkill");
+            Title.Clear();
+            // Input Title
+            string title = GlobalDefinitions.ExcelLib.ReadData(row, "Title");
+            Title.SendKeys(title);
+
+            string typedTitle = Title.GetAttribute("value");
+
+            //Assert the length of the Title is a 100 characters
+            Assert.LessOrEqual(typedTitle.Length, 100);
+
+            // logging to extent reports
+            test.Log(LogStatus.Info, "Successfully Verified character length of Title");
+        }
+        internal void VerifyUserCannotInputTitleWithInvalidCharacters(string title, string expectedErrorMessage, ExtentTest test)
+        {
+            wait(3);
+            Title.Clear();
+            Title.SendKeys(title);
+            Assert.That(TitleErrorMessage.Text == expectedErrorMessage);
+
+            // logging to extent reports
+            test.Log(LogStatus.Info, "Successfully Verified User cannot input Title with Invalid characters");
+        }
+        internal void VerifyUserCannotInputDescriptionWithInvalidCharacters(string description, string expectedErrorMessage, ExtentTest test)
+        {
+            wait(3);
+            Description.Clear();
+            Description.SendKeys(description);
+            Assert.That(DescriptionErrorMessage.Text == expectedErrorMessage);
+
+            // logging to extent reports
+            test.Log(LogStatus.Info, "Successfully Verified User cannot input Descripton with Invalid characters");
+        }
+        internal void VerifyCharacterLengthOfDescription(int row, ExtentTest test)
+        {
+            //Populate the Excel Sheet
+            GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "ShareSkill");
+            Description.Clear();
+            // Input Description
+            string description = GlobalDefinitions.ExcelLib.ReadData(row, "Description");
+            Description.SendKeys(description);
+
+            string typedDescription = Description.GetAttribute("value");
+
+            //Assert the length of the Description is 600 characters
+            Assert.LessOrEqual(typedDescription.Length, 600);
+
+            // logging to extent reports
+            test.Log(LogStatus.Info, "Successfully Verified character length of Description");
         }
     }
 }
